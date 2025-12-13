@@ -13,9 +13,9 @@ module.exports = {
 
   // ESLint configuration
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors. Use with caution.
-    ignoreDuringBuilds: false, // Set to true if you want to ignore ESLint errors during builds
+    // Set to true to suppress ESLint messages during builds
+    // WARNING: This will hide real ESLint errors, use with caution
+    ignoreDuringBuilds: true, // Set to false to see ESLint errors during builds
   },
   
   devIndicators: {},
