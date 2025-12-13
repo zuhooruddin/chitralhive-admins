@@ -16,6 +16,7 @@
     "*.+(js|jsx)": [
       "prettier --write --ignore-unknown"
     ],
+    
     "*.+(json|css|md)": [
       "prettier --write"
     ]
