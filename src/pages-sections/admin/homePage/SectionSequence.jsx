@@ -15,13 +15,16 @@ const SectionSequence = (props) => {
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
     const [open, setOpen] = useState(false);
     
+    // Destructure props to avoid exhaustive-deps warning
+    const { setGetSubcategoryData, index } = props;
+    
     const [Sub_Category, setSub_Category]=useState([]);
     useEffect(()=> {        
-        props.setGetSubcategoryData(prevState => ({
+        setGetSubcategoryData(prevState => ({
         ...prevState,
-        ["Subcategories"+props.index]: [Sub_Category],
+        ["Subcategories"+index]: [Sub_Category],
         }));
-    }, [Sub_Category]);
+    }, [Sub_Category, setGetSubcategoryData, index]);
     let loopFlag = useRef(false);
     // if (props.allCategoriesData && props.value) {    
 
@@ -61,52 +64,55 @@ console.log("Filtered",filteredCategory)
 
         // ============================================subcategories loop============================================
 
-        
-        let newSub_CategoryList = []
-        let Sub_CategoryFilter = []
-        let CategorySub_CategoryData = []
-        let length = 0;
+        // Destructure props used in useEffect to avoid exhaustive-deps warning
+        const { boxOrderData, allCategoriesData, value, SubCategoryValue } = props;
 
         useEffect(() => {
-            if(Sub_Category !== undefined && props.boxOrderData !== undefined && props.allCategoriesData !== undefined){
+            if(Sub_Category !== undefined && boxOrderData !== undefined && allCategoriesData !== undefined){
+                // Move variable declarations inside useEffect to avoid assignment warnings
+                let newSub_CategoryList = []
+                let Sub_CategoryFilter = []
+                let CategorySub_CategoryData = []
+                let length = 0;
+                
                 // if(Sub_Category.length !== 0){
                 //     newSub_CategoryList = []
-                //     Sub_CategoryFilter = props.allCategoriesData.filter(item =>item.parentId_id === props.value.id)
-                //     length = (Sub_CategoryFilter.length > props.SubCategoryValue) ? props.SubCategoryValue : Sub_CategoryFilter.length;
+                //     Sub_CategoryFilter = allCategoriesData.filter(item =>item.parentId_id === value.id)
+                //     length = (Sub_CategoryFilter.length > SubCategoryValue) ? SubCategoryValue : Sub_CategoryFilter.length;
                 //     for (let i = 0; i < length; i++) {
                 //         newSub_CategoryList.push({ sequenceNo:i+1, image: Sub_CategoryFilter[i].icon, category_slug: Sub_CategoryFilter[i].slug, name: Sub_CategoryFilter[i].name, id: Sub_CategoryFilter[i].id, parent: Sub_CategoryFilter[i].parentId_id, type: "section_subcategory"});
                 //     }
                 //     setSub_Category(newSub_CategoryList);
                 // }
                 // else{
-                    Sub_CategoryFilter = props.boxOrderData.filter(item => item.type === "section_subcategory" && item.parent === props.value.id);
+                    Sub_CategoryFilter = boxOrderData.filter(item => item.type === "section_subcategory" && item.parent === value.id);
                     Sub_CategoryFilter.sort((a, b) => a.sequenceNo - b.sequenceNo);
-                    CategorySub_CategoryData = props.allCategoriesData.filter(item =>item.parentId_id === props.value.id)
+                    CategorySub_CategoryData = allCategoriesData.filter(item =>item.parentId_id === value.id)
                     if (Sub_CategoryFilter.length === 0) {
-                        length = (CategorySub_CategoryData.length > props.SubCategoryValue) ? props.SubCategoryValue : CategorySub_CategoryData.length;
+                        length = (CategorySub_CategoryData.length > SubCategoryValue) ? SubCategoryValue : CategorySub_CategoryData.length;
                         for (let i = 0; i < length; i++) {
                             newSub_CategoryList.push({ sequenceNo:i+1, image: CategorySub_CategoryData[i].icon, category_slug: CategorySub_CategoryData[i].slug, name: CategorySub_CategoryData[i].name, id: CategorySub_CategoryData[i].id, parent: CategorySub_CategoryData[i].parentId_id, type: "section_subcategory"});
                         }
                     }
-                    else if (Sub_CategoryFilter.length === props.SubCategoryValue){
-                        length = (Sub_CategoryFilter.length > props.SubCategoryValue) ? props.SubCategoryValue : Sub_CategoryFilter.length;
+                    else if (Sub_CategoryFilter.length === SubCategoryValue){
+                        length = (Sub_CategoryFilter.length > SubCategoryValue) ? SubCategoryValue : Sub_CategoryFilter.length;
                         for (let i = 0; i < length; i++) {
                             newSub_CategoryList.push({ sequenceNo: Sub_CategoryFilter[i].sequenceNo, image: Sub_CategoryFilter[i].image, category_slug: Sub_CategoryFilter[i].category_slug, name: Sub_CategoryFilter[i].category_name, id: Sub_CategoryFilter[i].category_id_id, parent: Sub_CategoryFilter[i].parent, type: Sub_CategoryFilter[i].type});
                         }
                     }
                     else{
-                        if (Sub_CategoryFilter.length < props.SubCategoryValue){
+                        if (Sub_CategoryFilter.length < SubCategoryValue){
                             for (let i = 0; i < Sub_CategoryFilter.length; i++) {
                                 let List = Sub_CategoryFilter.filter(item => item.sequenceNo === i+1 && item.parent === Sub_CategoryFilter[i].parent)
                                 newSub_CategoryList.push({ sequenceNo: Sub_CategoryFilter[i].sequenceNo, image: Sub_CategoryFilter[i].image, category_slug: Sub_CategoryFilter[i].category_slug, name: Sub_CategoryFilter[i].category_name, id: Sub_CategoryFilter[i].category_id_id, type: Sub_CategoryFilter[i].type, parent: Sub_CategoryFilter[i].parent});
                             }
-                            let length = (CategorySub_CategoryData.length > props.SubCategoryValue) ? props.SubCategoryValue : CategorySub_CategoryData.length; 
+                            let length = (CategorySub_CategoryData.length > SubCategoryValue) ? SubCategoryValue : CategorySub_CategoryData.length; 
                             for (let i = Sub_CategoryFilter.length; i < length; i++) {
                                 newSub_CategoryList.push({ sequenceNo: i+1, image: CategorySub_CategoryData[i].icon, category_slug: CategorySub_CategoryData[i].slug, name: CategorySub_CategoryData[i].name, id: CategorySub_CategoryData[i].id, type: 'section_subcategory', parent: CategorySub_CategoryData[i].parentId_id});
                             }
                           }
                         else{
-                            for (let i = 0; i < props.SubCategoryValue; i++) {
+                            for (let i = 0; i < SubCategoryValue; i++) {
                                 newSub_CategoryList.push({ sequenceNo: Sub_CategoryFilter[i].sequenceNo, image: Sub_CategoryFilter[i].image, category_slug: Sub_CategoryFilter[i].category_slug, name: Sub_CategoryFilter[i].category_name, id: Sub_CategoryFilter[i].category_id_id, type: Sub_CategoryFilter[i].type, parent: Sub_CategoryFilter[i].parent});
                             }
                         }
@@ -114,7 +120,7 @@ console.log("Filtered",filteredCategory)
                     setSub_Category(newSub_CategoryList);
                 
             } else {<p>Loading...</p>}
-        }, [props.value])
+        }, [value, boxOrderData, allCategoriesData, SubCategoryValue])
 
         // ==========================================subcategories loop ends==========================================
 
