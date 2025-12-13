@@ -38,10 +38,30 @@ async function refreshAccessTokenCredentials(token) {
 export default NextAuth({
   // Base URL for NextAuth (set via NEXTAUTH_URL environment variable)
   // This ensures the redirect URI is correctly constructed for OAuth callbacks
+  // NextAuth will automatically append /api/auth/ to construct API routes
+  // IMPORTANT: NEXTAUTH_URL should be the base domain (e.g., https://chitralhive.com)
+  // If your app is deployed at /admin/, you should use basePath in next.config.js
+  // instead of including /admin/ in NEXTAUTH_URL
   ...(process.env.NEXTAUTH_URL && { 
-    url: process.env.NEXTAUTH_URL.endsWith('/') 
-      ? process.env.NEXTAUTH_URL.slice(0, -1) 
-      : process.env.NEXTAUTH_URL 
+
+    url: (() => {
+      let url = process.env.NEXTAUTH_URL.endsWith('/') 
+        ? process.env.NEXTAUTH_URL.slice(0, -1) 
+        : process.env.NEXTAUTH_URL;
+      // Extract just the origin (protocol + host) to avoid path issues
+      // NextAuth will construct routes relative to this base URL
+      try {
+        const urlObj = new URL(url);
+        // If the path is just '/admin' or '/admin/', extract just the origin
+        // Otherwise, keep the full URL
+        if (urlObj.pathname === '/admin' || urlObj.pathname === '/admin/') {
+          return urlObj.origin;
+        }
+        return url;
+      } catch {
+        return url;
+      }
+    })()
   }),
   secret: process.env.JWT_SECRET,
 
