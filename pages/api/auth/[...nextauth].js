@@ -200,9 +200,16 @@ export default NextAuth({
 
 
     async session({ session, token, user }) {
-      session.user = token.user
-      session.accessToken = token.accessToken
-      session.error = token.error
+      // Only set session properties if token exists and has valid data
+      if (token.user) {
+        session.user = token.user
+      }
+      if (token.accessToken) {
+        session.accessToken = token.accessToken
+      }
+      if (token.error) {
+        session.error = token.error
+      }
 
 
       const url = process.env.NEXT_PUBLIC_BACKEND_API_BASE + "getGeneralSetting";
@@ -232,14 +239,19 @@ export default NextAuth({
 
 
 
-      if (session.error === 'SessionTimedOut'){
+      // Handle session timeout
+      if (session.error === 'SessionTimedOut' || token.error === 'SessionTimedOut'){
         session.accessToken = undefined;
         session.refreshToken = undefined;
         session.user = undefined;
       }
-      session.expires = new Date(token.accessTokenExpires).toISOString();
-      session.accessTokenExpires = token.accessTokenExpires;
-      // session.expires = new Date(token.accessTokenExpires).toISOString();
+      
+      // Set expiration only if token has expiration data
+      if (token.accessTokenExpires) {
+        session.expires = new Date(token.accessTokenExpires).toISOString();
+        session.accessTokenExpires = token.accessTokenExpires;
+      }
+      
       return session
     },
   },

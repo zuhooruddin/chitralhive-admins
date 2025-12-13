@@ -65,9 +65,11 @@ const App = ({ router, Component, pageProps:{session, ...pageProps} }) => {
           <SessionProvider 
             session={session}
             // basePath tells NextAuth where to find the API routes
-            // If your app is at /admin/ and routes are at /admin/api/auth, use basePath="/admin/api/auth"
-            // If routes are at root /api/auth, use basePath="/api/auth" or omit it
+            // Since NextAuth routes are at /api/auth/[...nextauth], basePath should be "/api/auth"
             basePath="/api/auth"
+            // refetchInterval: 0 means NextAuth won't auto-refetch the session
+            // This prevents the client from trying to fetch from wrong URLs
+            refetchInterval={0}
           >
             <ConfirmProvider>
               {Component.auth ? (
