@@ -62,7 +62,13 @@ const App = ({ router, Component, pageProps:{session, ...pageProps} }) => {
       <SettingsProvider>
         <AppProvider>
           <MuiTheme>
-          <SessionProvider session={session}>
+          <SessionProvider 
+            session={session}
+            // basePath tells NextAuth where to find the API routes
+            // If your app is at /admin/ and routes are at /admin/api/auth, use basePath="/admin/api/auth"
+            // If routes are at root /api/auth, use basePath="/api/auth" or omit it
+            basePath="/api/auth"
+          >
             <ConfirmProvider>
               {Component.auth ? (
                 <Auth>

@@ -43,23 +43,19 @@ export default NextAuth({
   // If your app is deployed at /admin/, you should use basePath in next.config.js
   // instead of including /admin/ in NEXTAUTH_URL
   ...(process.env.NEXTAUTH_URL && { 
-
     url: (() => {
       let url = process.env.NEXTAUTH_URL.endsWith('/') 
         ? process.env.NEXTAUTH_URL.slice(0, -1) 
         : process.env.NEXTAUTH_URL;
-      // Extract just the origin (protocol + host) to avoid path issues
-      // NextAuth will construct routes relative to this base URL
+      // Always extract just the origin (protocol + host) to avoid path issues
+      // Next.js basePath (if set) will handle the /admin/ path automatically
       try {
         const urlObj = new URL(url);
-        // If the path is just '/admin' or '/admin/', extract just the origin
-        // Otherwise, keep the full URL
-        if (urlObj.pathname === '/admin' || urlObj.pathname === '/admin/') {
-          return urlObj.origin;
-        }
-        return url;
+        return urlObj.origin;
       } catch {
-        return url;
+        // If URL parsing fails, try to extract origin manually
+        const match = url.match(/^https?:\/\/[^\/]+/);
+        return match ? match[0] : url;
       }
     })()
   }),

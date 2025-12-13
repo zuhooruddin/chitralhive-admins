@@ -7,6 +7,8 @@
 // module.exports = nextConfig
 
 module.exports = {
+  // Set basePath if the app is deployed at /admin/ path
+  // Uncomment the line below if your app is served at https://chitralhive.com/admin/
   // basePath: '/admin',
 
   
