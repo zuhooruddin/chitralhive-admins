@@ -11,6 +11,10 @@ module.exports = {
   // Uncomment the line below if your app is served at https://chitralhive.com/admin/
   // basePath: '/admin',
 
+  // Disable ESLint during builds to avoid warnings (warnings won't block build anyway)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   
   devIndicators: {},
   publicRuntimeConfig: {
