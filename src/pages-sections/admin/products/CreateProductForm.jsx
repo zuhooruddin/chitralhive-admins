@@ -159,6 +159,7 @@ const CreateProductForm = (props) => {
           <br /><br />
           {values.image && (
             <div style={{ position: 'relative', display: 'inline-block' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={URL.createObjectURL(values.image)}
                 alt="Selected  logo"

@@ -28,6 +28,7 @@ const FooterForm = (props) => {
           <br /><br />
           {values.footerLogo && (
             <div style={{ position: 'relative', display: 'inline-block' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={URL.createObjectURL(values.footerLogo)}
                 alt="Selected footer logo"

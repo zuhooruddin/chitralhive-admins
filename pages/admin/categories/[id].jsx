@@ -33,10 +33,10 @@ export default function EditCategory(props) {
     return <Box py={4}>Loading...</Box>;
   }
 
-  if (!session || !session.accessToken) {
-    router.push('/login');
-    return null;
-  }
+  // if (!session || !session.accessToken) {
+  //   router.push('/login');
+  //   return null;
+  // }
 
   const reloadSession = async () => {
     try {

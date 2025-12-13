@@ -1,14 +1,17 @@
+import Script from "next/script";
 import React from "react";
 
 const GoogleAnalytics = () => {
   return (
-    <React.Fragment>
+    <>
       {/* Google analytics */}
-      <script
-        async
+      <Script
+        strategy="afterInteractive"
         src="https://www.googletagmanager.com/gtag/js?id=G-FLCDXWTVMD"
-      ></script>
-      <script
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -18,8 +21,8 @@ const GoogleAnalytics = () => {
             gtag('config', 'G-FLCDXWTVMD');
           `,
         }}
-      ></script>
-    </React.Fragment>
+      />
+    </>
   );
 };
 

@@ -1,9 +1,3 @@
 {
-  "extends": "next/core-web-vitals",
-  "rules": {
-    "@next/next/no-img-element": "warn",
-    "@next/next/next-script-for-ga": "warn",
-    "react-hooks/exhaustive-deps": "warn",
-    "import/no-anonymous-default-export": "warn"
-  }
+  "extends": "next/core-web-vitals"
 }

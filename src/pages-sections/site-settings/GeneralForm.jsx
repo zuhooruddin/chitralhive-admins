@@ -172,6 +172,7 @@ const GeneralForm =(props) => {
              <br /><br />
            {values.site_logo || values.logoimage?  
             <div style={{ position: 'relative', display: 'inline-block' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 // src={values.site_logo?imgbaseurl+values.site_logo:URL.createObjectURL(values.logoimage)}
                 src={values.logoimage? URL.createObjectURL(values.logoimage) : values.site_logo?imgbaseurl + values.site_logo:''}
@@ -435,6 +436,7 @@ const GeneralForm =(props) => {
          
           {values.footer_logo || values.footerLogo? 
             <div style={{ position: 'relative', display: 'inline-block' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={values.footerLogo? URL.createObjectURL(values.footerLogo) : imgbaseurl +values.footer_logo}
 
@@ -852,6 +854,7 @@ const GeneralForm =(props) => {
   {imgsSrc.length > 0 ? (
     imgsSrc.map((link, index) => (
       <div key={index} style={{ display: 'inline-block', position: 'relative', marginRight: '10px' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={link} width={100} height={100} alt="Slider Image" />
         <button
           type="button"
@@ -877,6 +880,7 @@ const GeneralForm =(props) => {
   ) : (
     values.banner_slider_image.map((link, index) => (
       <div key={index} style={{ display: 'inline-block', position: 'relative', marginRight: '10px' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imgbaseurl + link.image} width={100} height={100} alt="Slider Image" />
       </div>
     ))
@@ -1029,6 +1033,7 @@ const GeneralForm =(props) => {
              <br /><br />
            {values.site_splash || values.splashimage?  
             <div style={{ position: 'relative', display: 'inline-block' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={values.splashimage? URL.createObjectURL(values.splashimage) : values.site_splash?imgbaseurl + values.site_splash:''}
 

@@ -37,10 +37,10 @@ export default function EditProduct(props) {
     return <Box py={4}>Loading...</Box>;
   }
 
-  if (!session || !session.accessToken) {
-    router.push('/login');
-    return null;
-  }
+  // if (!session || !session.accessToken) {
+  //   router.push('/login');
+  //   return null;
+  // }
 
   const reloadSession = async () => {
     try {
@@ -310,18 +310,18 @@ export default function EditProduct(props) {
 
 export async function getServerSideProps(context) {
   var sessionValue = await getSession(context);
-  if (!sessionValue) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
+  // if (!sessionValue) {
+  //   return {
+  //     redirect: {
+  //       destination: '/login',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
   const itemId = context.query['id'];
-  const data = await api.getItem(itemId,sessionValue.accessToken);
-  const itemCategory = await api.getItemCategory(itemId,sessionValue.accessToken);
-  const imgGallery = await api.getItemGallery(itemId,sessionValue.accessToken);
+  const data = await api.getItem(itemId,sessionValue?.accessToken);
+  const itemCategory = await api.getItemCategory(itemId,sessionValue?.accessToken);
+  const imgGallery = await api.getItemGallery(itemId,sessionValue?.accessToken);
   const allCategories = await api.getAllCategories();
 
   return { props: { data:data,allCategories:allCategories,imgGallery:imgGallery,itemCategory:itemCategory } }

@@ -577,7 +577,8 @@ const getChargesConfiguration = async (ConfigId,accessToken) => {
                         });
   return response.data;
 };
-export default {
+
+const api = {
   brands,
   orders,
   reviews,
@@ -650,3 +651,5 @@ export default {
   getAllCourier,
   getChargesConfiguration
 };
+
+export default api;
