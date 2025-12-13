@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import axios from 'axios';
 
 async function refreshAccessTokenCredentials(token) {
   const url = process.env.NEXT_PUBLIC_BACKEND_API_BASE + 'api/auth/token/refresh/'
@@ -35,6 +36,13 @@ async function refreshAccessTokenCredentials(token) {
 
 }
 export default NextAuth({
+  // Base URL for NextAuth (set via NEXTAUTH_URL environment variable)
+  // This ensures the redirect URI is correctly constructed for OAuth callbacks
+  ...(process.env.NEXTAUTH_URL && { 
+    url: process.env.NEXTAUTH_URL.endsWith('/') 
+      ? process.env.NEXTAUTH_URL.slice(0, -1) 
+      : process.env.NEXTAUTH_URL 
+  }),
   secret: process.env.JWT_SECRET,
 
 
@@ -64,21 +72,36 @@ export default NextAuth({
       },
       authorize: async (credentials) => {
         const payload = {
-          username: credentials.username,
+          email: credentials.username, // Send email in email field
+          username: credentials.username, // Also send in username field for compatibility
           password: credentials.password,
           role: credentials.role
         };
         const url = process.env.NEXT_PUBLIC_BACKEND_API_BASE + 'api/auth/login/'
-        const res = await fetch(url, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" }
-        })
-        const user = await res.json()
-        if (res.ok && user) {
-          return user;
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: { "Content-Type": "application/json" }
+          })
+          
+          // Check if response is JSON
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.error("Non-JSON response from backend:", text.substring(0, 200));
+            return null;
+          }
+          
+          const user = await res.json()
+          if (res.ok && user) {
+            return user;
+          }
+          return null;
+        } catch (error) {
+          console.error("Login error:", error);
+          return null;
         }
-        return null;
       }
     }),
 
@@ -117,7 +140,7 @@ export default NextAuth({
         // make a POST request to the DRF backend
         const response = await axios({
           method: 'post',
-          url: process.env.NEXT_PUBLIC_BACKEND_API_BASE + 'google/',
+          url: process.env.NEXT_PUBLIC_BACKEND_API_BASE + 'api/google/',
           data: {
             access_token: account.access_token,
             id_token: account.id_token,

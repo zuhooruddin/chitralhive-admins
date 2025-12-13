@@ -11,6 +11,7 @@ import React, {useState} from "react";
 import * as yup from "yup"; // form field validation schema
 import {useSession} from 'next-auth/react';
 import { getSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Name Required"),
@@ -25,27 +26,26 @@ EditCategory.getLayout = function getLayout(page) {
 
 export default function EditCategory(props) {
   const router = useRouter();
-  const { data: session, status } = useSession()
-  const callAPI = async () => {
+  const { data: session, status, update } = useSession()
+
+  // Redirect to login if session is not available
+  if (status === "loading") {
+    return <Box py={4}>Loading...</Box>;
+  }
+
+  if (!session || !session.accessToken) {
+    router.push('/login');
+    return null;
+  }
+
+  const reloadSession = async () => {
     try {
-        const res = await fetch(
-            `/api/auth/session`,
-            {
-                method: 'GET',
-            }
-        );
-        const data = await res.json();
-        session = data;
+      await update(); // This will trigger NextAuth to refresh the session
     } catch (err) {
       toast.error('Session refresh failed!', {
         position: toast.POSITION.TOP_RIGHT
       });
     }
-  };
-  const reloadSession = () => {
-    const event = new Event("visibilitychange");
-    document.dispatchEvent(event);
-      callAPI();
   };
   if(props.data[0]['description']==null){props.data[0]['description']='';}
   if(props.data[0]['metaUrl']==null){props.data[0]['metaUrl']='';}
@@ -72,6 +72,12 @@ export default function EditCategory(props) {
               .replace(/ /g,'-').replace(/[-]+/g, '-').replace(/[^\w-]+|_/g,'');
   }
   async function updateCategory(data,id,setdisableButtonCheck){
+    if (!session || !session.accessToken) {
+      toast.error('Session expired. Please login again.', {position: toast.POSITION.TOP_RIGHT});
+      router.push('/login');
+      return;
+    }
+
     const categoryModel = await axiosInstance
       .patch(server_ip+`updateCategory/${id}`, data, {
           headers: {
@@ -90,7 +96,12 @@ export default function EditCategory(props) {
           // return error.response;
           if (error.response) {
             //// if api not found or server responded with some error codes e.g. 404
-          if(error.response.status==400){
+          if(error.response.status === 401){
+            // Token expired or invalid - try to refresh session
+            reloadSession().then(() => {
+              toast.info('Session expired. Please try again.', {position: toast.POSITION.TOP_RIGHT});
+            });
+          } else if(error.response.status==400){
             var a =Object.keys(error.response.data)[0]
             toast.error(error.response.data[a].toString(), {position: toast.POSITION.TOP_RIGHT});
           }
@@ -109,6 +120,12 @@ export default function EditCategory(props) {
       });
   }
   async function checkCategoryChange(data){
+    if (!session || !session.accessToken) {
+      toast.error('Session expired. Please login again.', {position: toast.POSITION.TOP_RIGHT});
+      router.push('/login');
+      return;
+    }
+
     const myNewModel = await axiosInstance
       .post(`${server_ip}checkCategoryChange`, data, {
           headers: {
@@ -133,7 +150,12 @@ export default function EditCategory(props) {
           // return error.response;
           if (error.response) {
             //// if api not found or server responded with some error codes e.g. 404
-          if(error.response.status==400){
+          if(error.response.status === 401){
+            // Token expired or invalid - try to refresh session
+            reloadSession().then(() => {
+              toast.info('Session expired. Please try again.', {position: toast.POSITION.TOP_RIGHT});
+            });
+          } else if(error.response.status==400){
             var a =Object.keys(error.response.data)[0]
             toast.error("Error Occured while updating Sequence & Box Order.", {position: toast.POSITION.TOP_RIGHT});
           }
@@ -154,6 +176,15 @@ export default function EditCategory(props) {
 
   const handleFormSubmit = (values) => {
     event.preventDefault();
+    
+    if (!session || !session.accessToken || !session.expires) {
+      toast.error('Session expired. Please login again.', {
+        position: toast.POSITION.TOP_RIGHT
+      });
+      router.push('/login');
+      return;
+    }
+
     const formData = new FormData();
     if (values.file){
       formData.append("icon", values['file'], 
@@ -173,8 +204,10 @@ export default function EditCategory(props) {
       toast.info('Session Expired! Refreshing Session.... Kindly try again to submit', {
         position: toast.POSITION.TOP_RIGHT
       });
+      return;
     }
-    else if(Math.floor(new Date(Date.now()))<Math.floor(new Date(session.expires))){
+    
+    if(Math.floor(new Date(Date.now()))<Math.floor(new Date(session.expires))){
       updateCategory(formData,values.id,setdisableButtonCheck);
     }
     

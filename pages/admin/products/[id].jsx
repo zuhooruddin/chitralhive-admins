@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { toast } from 'react-toastify';
 import { getSession } from "next-auth/react"
 import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("required"),
@@ -29,28 +30,26 @@ EditProduct.getLayout = function getLayout(page) {
 
 export default function EditProduct(props) {
   const router = useRouter();
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
 
-  const callAPI = async () => {
+  // Redirect to login if session is not available
+  if (status === "loading") {
+    return <Box py={4}>Loading...</Box>;
+  }
+
+  if (!session || !session.accessToken) {
+    router.push('/login');
+    return null;
+  }
+
+  const reloadSession = async () => {
     try {
-        const res = await fetch(
-            `/api/auth/session`,
-            {
-                method: 'GET',
-            }
-        );
-        const data = await res.json();
-        session = data;
+      await update(); // This will trigger NextAuth to refresh the session
     } catch (err) {
       toast.error('Session refresh failed!', {
         position: toast.POSITION.TOP_RIGHT
       });
     }
-  };
-  const reloadSession = () => {
-    const event = new Event("visibilitychange");
-    document.dispatchEvent(event);
-      callAPI();
   };
 
   const itemCategoryList = []
@@ -103,6 +102,11 @@ export default function EditProduct(props) {
     isFeatured:       props.data[0]['isFeatured'],
   };
   async function updateItem(data,id,setdisableButtonCheck){
+    if (!session || !session.accessToken) {
+      toast.error('Session expired. Please login again.', {position: toast.POSITION.TOP_RIGHT});
+      router.push('/login');
+      return;
+    }
 
     const myNewModel = await axiosInstance
       .patch(server_ip+`updateItem/${id}`, data, {
@@ -126,7 +130,12 @@ export default function EditProduct(props) {
       }).catch((error) => {
           if (error.response) {
             //// if api not found or server responded with some error codes e.g. 404
-          if(error.response.status==400){
+          if(error.response.status === 401){
+            // Token expired or invalid - try to refresh session
+            reloadSession().then(() => {
+              toast.info('Session expired. Please try again.', {position: toast.POSITION.TOP_RIGHT});
+            });
+          } else if(error.response.status==400){
             var a =Object.keys(error.response.data)[0]
             toast.error(error.response.data[a].toString(), {position: toast.POSITION.TOP_RIGHT});
           }
@@ -145,6 +154,12 @@ export default function EditProduct(props) {
       });
   }
   async function updateItemCategory(data,id){
+    if (!session || !session.accessToken) {
+      toast.error('Session expired. Please login again.', {position: toast.POSITION.TOP_RIGHT});
+      router.push('/login');
+      return;
+    }
+
     const myNewModel = await axiosInstance
       .post(server_ip+`updateItemCategory/${id}`, data, {
           headers: {
@@ -166,9 +181,16 @@ export default function EditProduct(props) {
     }).catch((error) => {
       if (error.response) {
         //// if api not found or server responded with some error codes e.g. 404
-        toast.error('Error Occured', {
-          position: toast.POSITION.TOP_RIGHT
-        });
+        if(error.response.status === 401){
+          // Token expired or invalid - try to refresh session
+          reloadSession().then(() => {
+            toast.info('Session expired. Please try again.', {position: toast.POSITION.TOP_RIGHT});
+          });
+        } else {
+          toast.error('Error Occured', {
+            position: toast.POSITION.TOP_RIGHT
+          });
+        }
         return error.response
       } else if (error.request) {
         /// Network error api call not reached on server
@@ -185,6 +207,11 @@ export default function EditProduct(props) {
     });
   }
   async function updateItemGallery(data,id){
+    if (!session || !session.accessToken) {
+      toast.error('Session expired. Please login again.', {position: toast.POSITION.TOP_RIGHT});
+      router.push('/login');
+      return;
+    }
 
     const myNewModel = await axiosInstance
       .post(server_ip+`updateItemGallery/${id}`, data, {
@@ -195,19 +222,35 @@ export default function EditProduct(props) {
       }).then((res) => {
           return res;
       }).catch((error) => {
+          if (error.response && error.response.status === 401) {
+            // Token expired or invalid - try to refresh session
+            reloadSession().then(() => {
+              toast.info('Session expired. Please try again.', {position: toast.POSITION.TOP_RIGHT});
+            });
+          }
           return error.response;
       });
   }
 
   const handleFormSubmit = (values) => {
     // event.preventDefault();
-    if(Math.floor(new Date(Date.now()))>Math.floor(new Date(session.expires))){
-      reloadSession();
-      toast.info('Session Expired! Refreshing Session....', {
+    if (!session || !session.accessToken || !session.expires) {
+      toast.error('Session expired. Please login again.', {
         position: toast.POSITION.TOP_RIGHT
       });
+      router.push('/login');
+      return;
     }
-    else if(Math.floor(new Date(Date.now()))<Math.floor(new Date(session.expires))){
+
+    if(Math.floor(new Date(Date.now()))>Math.floor(new Date(session.expires))){
+      reloadSession();
+      toast.info('Session Expired! Refreshing Session.... Please try again.', {
+        position: toast.POSITION.TOP_RIGHT
+      });
+      return;
+    }
+    
+    if(Math.floor(new Date(Date.now()))<Math.floor(new Date(session.expires))){
 
       const formData = new FormData();
       if (values.imageFile){
