@@ -258,15 +258,42 @@ export default function EditProduct(props) {
         initialValues['extPosId']+"."+values['imageFile'].name.split(".")[1]);
       }
       
+      // Basic product information
+      if(values.name!=initialValues['name']){formData.append("name", values['name'])}
+      if(values.description!=initialValues['description']){formData.append("description", values['description'])}
+      if(values.slug!=initialValues['slug']){formData.append("slug", values['slug'])}
+      
+      // Measurements
+      if(values.length!=initialValues['length']){formData.append("length", values['length'])}
+      if(values.height!=initialValues['height']){formData.append("height", values['height'])}
+      if(values.weight!=initialValues['weight']){formData.append("weight", values['weight'])}
+      if(values.width!=initialValues['width']){formData.append("width", values['width'])}
+      
+      // Pricing
+      if(values.mrp!=initialValues['mrp']){formData.append("mrp", values['mrp'])}
+      if(values.salePrice!=initialValues['salePrice']){formData.append("salePrice", values['salePrice'])}
+      
+      // Stock
+      if(values.stock!=initialValues['stock']){formData.append("stock", values['stock'])}
+      if(values.stockCheckQty!=initialValues['stockCheckQty']){formData.append("stockCheckQty", values['stockCheckQty'])}
+      
+      // External parties
+      if(values.author!=initialValues['author']){formData.append("author", values['author'])}
+      if(values.manufacturer!=initialValues['manufacturer']){formData.append("manufacturer", values['manufacturer'])}
+      if(values.isbn!=initialValues['isbn']){formData.append("isbn", values['isbn'])}
+      
+      // Social links
       if(values.youtube_link!=initialValues['youtube_link']){formData.append("youtube_link", values['youtube_link'])}
       if(values.facebook_link!=initialValues['facebook_link']){formData.append("facebook_link", values['facebook_link'])}
       if(values.twitter_link!=initialValues['twitter_link']){formData.append("twitter_link", values['twitter_link'])}
       if(values.instagram_link!=initialValues['instagram_link']){formData.append("instagram_link", values['instagram_link'])}
-      if(values.slug!=initialValues['slug']){formData.append("slug", values['slug'])}
+      
+      // SEO
       if(values.metaUrl!=initialValues['metaUrl']){formData.append("metaUrl", values['metaUrl'])}
       if(values.metaTitle!=initialValues['metaTitle']){formData.append("metaTitle", values['metaTitle'])}
       if(values.metaDescription!=initialValues['metaDescription']){formData.append("metaDescription", values['metaDescription'])}
-      if(values.stockCheckQty!=initialValues['stockCheckQty']){formData.append("stockCheckQty", values['stockCheckQty'])}
+      
+      // Featured/New Arrival
       if(values.isNewArrival!=initialValues['isNewArrival']){formData.append("isNewArrival", values['isNewArrival'])}
       if(values.newArrivalTill!=initialValues['newArrivalTill']){formData.append("newArrivalTill", values['newArrivalTill'])}
       if(values.isFeatured!=initialValues['isFeatured']){formData.append("isFeatured", values['isFeatured'])}

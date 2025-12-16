@@ -40,7 +40,7 @@ console.log("Proper",props)
   const imgBaseUrl = process.env.NEXT_PUBLIC_BACKEND_IMAGE_URL
   if(disableButtonCheck==true){disableButton=true}  
   const [selectTab, setSelectTab] = useState("image");
-  const disabledField = true
+  const disabledField = false
   const myLoader = ({ src, width, quality }) => {
     return imgBaseUrl+`${src}`
     // ?w=${width}&q=${quality || 75}
@@ -111,16 +111,47 @@ console.log("Proper",props)
               </Box>
 
               <StyledTabPanel value="image">
-                {/* <input id="file" accept="image/jpeg,image/png,image/gif" name="file" type="file" onChange={(event) => {
-                    setFieldValue("imageFile", event.currentTarget.files[0]);
-                }} /> */}
-                <Image
-                loader={myLoader}
-                src={values.image}
-                alt="Product Image"
-                width={200}
-                height={200}
-                />
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <H4>Product Image</H4>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <input 
+                      id="file" 
+                      accept="image/jpeg,image/png,image/gif" 
+                      name="file" 
+                      type="file" 
+                      onChange={(event) => {
+                        setFieldValue("imageFile", event.currentTarget.files[0]);
+                        if (event.currentTarget.files[0]) {
+                          const reader = new FileReader();
+                          reader.readAsDataURL(event.currentTarget.files[0]);
+                          reader.onload = () => {
+                            setImgsSrc([reader.result]);
+                          };
+                        }
+                      }} 
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    {imgsSrc.length > 0 ? (
+                      <Image
+                        src={imgsSrc[0]}
+                        alt="Product Image Preview"
+                        width={200}
+                        height={200}
+                      />
+                    ) : (
+                      <Image
+                        loader={myLoader}
+                        src={values.image}
+                        alt="Product Image"
+                        width={200}
+                        height={200}
+                      />
+                    )}
+                  </Grid>
+                </Grid>
               </StyledTabPanel>
               <StyledTabPanel value="categories">
               <Autocomplete
@@ -447,42 +478,59 @@ console.log("Proper",props)
               </StyledTabPanel>
 
               <StyledTabPanel value="gallery-images">
-                {/* <input onChange={(event) => {
-                    setFieldValue("galleryFile", event.currentTarget.files);
-                    onChangeImage(event);
-                }} type="file" name="file" multiple />
-                {imgsSrc.map((link) => (
-                    <Image key={link} src={link} width={100} height={100} alt="Product Image" />
-                ))} */}
-              
-                {imgGallery?
-                <Grid container spacing={2}>
+                <Grid container spacing={3}>
                   <Grid item xs={12}>
-                    {/* <Divider sx={{my: 4,}}/> */}
-                    <H4 style={{marginBottom:'2%'}}>Gallery:</H4>
+                    <H4>Gallery Images</H4>
                   </Grid>
-                </Grid>:''}
-                {imgGallery?
-                imgGallery.map((link) => (
-                  <Image
-                  key={link['id']}
-                  loader={myLoader}
-                  src={link['image']}
-                  alt="Product Image"
-                  width={80}
-                  height={80}
-                  />
-                ))
-                :''}
-                
+                  <Grid item xs={12}>
+                    <input 
+                      onChange={(event) => {
+                        setFieldValue("galleryFile", event.currentTarget.files);
+                        onChangeImage(event);
+                      }} 
+                      type="file" 
+                      name="file" 
+                      multiple 
+                      accept="image/jpeg,image/png,image/gif"
+                    />
+                  </Grid>
+                  {imgsSrc.length > 0 && (
+                    <Grid item xs={12}>
+                      <H4>New Images Preview:</H4>
+                      {imgsSrc.map((link, index) => (
+                        <Image key={index} src={link} width={100} height={100} alt="Product Image Preview" style={{margin: '5px'}} />
+                      ))}
+                    </Grid>
+                  )}
+                  {imgGallery && imgGallery.length > 0 && (
+                    <>
+                      <Grid item xs={12}>
+                        <Divider sx={{my: 2}}/>
+                        <H4 style={{marginBottom:'2%'}}>Existing Gallery Images:</H4>
+                      </Grid>
+                      {imgGallery.map((link) => (
+                        <Grid item key={link['id']}>
+                          <Image
+                            loader={myLoader}
+                            src={link['image']}
+                            alt="Product Image"
+                            width={80}
+                            height={80}
+                          />
+                        </Grid>
+                      ))}
+                    </>
+                  )}
+                </Grid>
               </StyledTabPanel>
 
               <StyledTabPanel value="stock">
               <Grid container spacing={3}>
-                
+                <Grid item xs={12}>
+                  <H4>Stock Management</H4>
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
-                  disabled={disabledField}
                     fullWidth
                     color="info"
                     size="medium"
@@ -494,6 +542,19 @@ console.log("Proper",props)
                     value={values.stock}
                   />
                 </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    fullWidth
+                    color="info"
+                    size="medium"
+                    name="stockCheckQty"
+                    label="Stock Check Quantity"
+                    type="number"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.stockCheckQty}
+                  />
+                </Grid>
               </Grid>
               </StyledTabPanel>
             </TabContext>
@@ -501,7 +562,7 @@ console.log("Proper",props)
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Divider sx={{my: 4,}}/>
-                <H3 style={{marginBottom:'2%'}}>ReadOnly Fields</H3>
+                <H3 style={{marginBottom:'2%'}}>Product Details</H3>
               </Grid>
               <Grid item sm={6} xs={12}>
                 <TextField
