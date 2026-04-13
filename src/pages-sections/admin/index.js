@@ -30,6 +30,8 @@ import OrderRow from "./orders/OrderRow";
 
 import BrandRow from "./brand/BrandRow";
 import BrandForm from "./brand/BrandForm";
+import BlogRow from "./blog/BlogRow";
+import BlogForm from "./blog/BlogForm";
 
 import ProductRow from "./products/ProductRow";
 import ProductForm from "./products/ProductForm";
@@ -60,6 +62,8 @@ export {
   MultiSelectDropdown,
   OrderRow,
   BrandRow,
+  BlogRow,
+  BlogForm,
   ReviewRow,
   SellerRow,
   // Admin
