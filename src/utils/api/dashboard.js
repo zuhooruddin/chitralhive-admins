@@ -578,6 +578,21 @@ const getChargesConfiguration = async (ConfigId,accessToken) => {
   return response.data;
 };
 
+const getBlog = async (blogId, accessToken) => {
+  const response = await axios({
+    method: 'get',
+    url: `${server_ip}getBlog`,
+    params: {
+      id: blogId,
+    },
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
+    },
+  });
+
+  return response.data;
+};
+
 const api = {
   brands,
   orders,
@@ -649,7 +664,8 @@ const api = {
   getCountryConfiguration,
   getCourier,
   getAllCourier,
-  getChargesConfiguration
+  getChargesConfiguration,
+  getBlog
 };
 
 export default api;

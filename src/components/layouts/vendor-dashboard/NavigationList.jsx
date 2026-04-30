@@ -90,6 +90,20 @@ export const navigations = [
     ],
   },
   {
+    name: "Blog",
+    icon: duotone.Pages,
+    children: [
+      {
+        name: "Add Blog Post",
+        path: "/admin/blog/create",
+      },
+      {
+        name: "View All Posts",
+        path: "/admin/blog",
+      },
+    ],
+  },
+  {
     name: "Orders",
     icon: duotone.Order,
     children: [
@@ -226,6 +240,20 @@ export const superAdminNavigations = [
       {
         name: "View All Categories",
         path: "/admin/categories",
+      },
+    ],
+  },
+  {
+    name: "Blog",
+    icon: duotone.Pages,
+    children: [
+      {
+        name: "Add Blog Post",
+        path: "/admin/blog/create",
+      },
+      {
+        name: "View All Posts",
+        path: "/admin/blog",
       },
     ],
   },
