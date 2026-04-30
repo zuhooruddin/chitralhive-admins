@@ -5,7 +5,9 @@ import { useRouter } from "next/router";
 import React from "react"; // component props interface
 
 // styled component
-const StyledLink = styled("a")(({ theme, active_route }) => ({
+const StyledLink = styled("a", {
+  shouldForwardProp: (prop) => prop !== "active_route",
+})(({ theme, active_route }) => ({
   position: "relative",
   transition: "color 150ms ease-in-out",
   color: active_route === "active" ? theme.palette.primary.main : "inherit",
@@ -24,17 +26,16 @@ const NavLink = ({ href, children, style, className, ...props }) => {
 
   const currentRoute = checkRouteMatch();
   return (
-    <Link href={href} passHref>
-      <StyledLink
-        href={href}
-        style={style}
-        className={clsx(className)}
-        active_route={currentRoute ? "active" : ""}
-        {...props}
-      >
-        {children}
-      </StyledLink>
-    </Link>
+    <StyledLink
+      component={Link}
+      href={href}
+      style={style}
+      className={clsx(className)}
+      active_route={currentRoute ? "active" : ""}
+      {...props}
+    >
+      {children}
+    </StyledLink>
   );
 };
 
